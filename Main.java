@@ -1,5 +1,5 @@
 /*
-* The Main program handles the inputs and outputs of the binarySearch object.
+* The Main program is a recreation of the binarySearch program.
 *
 * @author  Ben Whitten
 * @version 1.0
@@ -14,9 +14,10 @@ import java.util.Scanner;  // Import the Scanner class
 public class Main {
 
   // variables for later.
-  private static final int maxNumberOfValues = 250;
+  private static int maxNumberOfValues = 250;
   private static final int maxGeneratedNumber = 100;
   private static int temp;
+  private static int low = 0;
 
   private static ArrayList<Integer> values = new ArrayList<Integer>();
 
@@ -81,6 +82,24 @@ public class Main {
 
   /////////////////////////////////////////////////////////////////////////////
   /**
+   * Add function adds a number to the list of numbers.
+   */
+  public static String add(String addNumber) {
+    try {
+      int addedInt = Integer.parseInt(addNumber);
+      values.add(addedInt);
+      maxNumberOfValues += 1;
+
+      // Returning a message to the user to say that the numbers were sorted.
+      return ("✓ Numbers Added Successfully ✓");
+
+    } catch (Exception e) {
+      return ("X Number Was Not Added Successfully X");
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  /**
    * Show function shows the list of numbers.
    */
   public static String show(String numbersAsString, int position) {
@@ -97,7 +116,7 @@ public class Main {
 
       } else {
         return "Current List Values:\n" + numbersAsString
-                + "✓ Numbers Shown Successfully ✓";
+                + "\n✓ Numbers Shown Successfully ✓";
       }
 
     } catch (Exception e) {
@@ -111,28 +130,27 @@ public class Main {
   /**
    * This function handles the input and output of the program.
    */
-  public static String search(String searchedNumber, int position,
-                              String foundPositions) {
-    try {
-      int searchedInt = Integer.parseInt(searchedNumber);
-      if (position < maxNumberOfValues) {
-        if (values.get(position) == searchedInt) {
-          foundPositions += " " + (position + 1);
-          return search(searchedNumber, position + 1, foundPositions);
-        }
+  public static int search(String searchedNumber,
+                              int low, int high, int timeThrough) {
 
-        return search(searchedNumber, position + 1, foundPositions);
+    int searchedInt = Integer.parseInt(searchedNumber);
 
-      } else if (foundPositions.equals("")) {
+    int middle = (low + high) / 2;
+        
+    if (high < low) {
+      return -1;
+    }
+    
+    if (timeThrough >= maxNumberOfValues) {
+      return -1;
+    }
 
-        return ("X Numbers Could Not Be Found X");
-
-      } else {
-        return "✓ Numbers Found Successfully ✓\n Found at positions:\n" 
-                + foundPositions;
-      }
-    } catch (Exception e) {
-      return ("X Numbers Could Not Be Found X");
+    if (searchedInt == values.get(middle)) {
+      return middle + 1;
+    } else if (searchedInt < values.get(middle)) {
+      return search(searchedNumber, low, middle - 1, timeThrough + 1);
+    } else {
+      return search(searchedNumber, middle + 1, high, timeThrough + 1);
     }
   }
 
@@ -152,7 +170,6 @@ public class Main {
     int sortPosition1 = 0;
     int sortPosition2 = 1;
     int showPosition1 = 0;
-    int searchPosition = 0;
 
     try {
       // Generating the numbers.
@@ -168,14 +185,45 @@ public class Main {
       System.out.println("");
       
       while (true) {
-        System.out.println("What number would you like to search for?");
-        String searchedNumber = scanSearch.nextLine();
-        System.out.println(search(searchedNumber, searchPosition,
-                                  foundPositions));
-        System.out.println("");
+        System.out.println("What would you like to do? [search] [add]");
+        String option = scanSearch.nextLine();
+        
+        if (option.equals("search")) {
+          System.out.println("");
+          System.out.println("What number would you like to search for?");
+          String searchedNumber = scanSearch.nextLine();
+          int timeThrough = 0;
+          System.out.println("Found at position: " + search(searchedNumber,
+                                                            low,
+                                                            maxNumberOfValues,
+                                                            timeThrough));
+          System.out.println("");
+
+        } else if (option.equals("add")) {
+          System.out.println("");
+          System.out.println("What number would you like to add to the list?");
+          String addNumber = scanSearch.nextLine();
+          System.out.println("");
+          System.out.println(add(addNumber));
+          System.out.println("");
+          // Sorting the numbers.
+          sortPosition1 = 0;
+          sortPosition2 = 1;
+          System.out.println(sort(sortPosition1, sortPosition2));
+          System.out.println("");
+          // Showing the numbers.
+          numbersAsString = "";
+          showPosition1 = 0;
+          System.out.println(show(numbersAsString, showPosition1));
+          System.out.println("");
+
+        } else {
+          System.out.println("ERROR: INVALID INPUT");
+        }
       }
 
     } catch (Exception e) {
+      System.out.println("");
       System.out.println("AN ERROR HAS OCCURED");
     }
   }
